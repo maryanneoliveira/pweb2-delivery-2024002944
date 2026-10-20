@@ -1,18 +1,21 @@
+
 import { ErroAplicacao } from '../utils/erros.js';
 
 export class MotoristasService {
+
   constructor(motoristasRepository, entregasRepository) {
     this.motoristasRepository = motoristasRepository;
     this.entregasRepository = entregasRepository;
   }
 
-  listar() {
-    return this.motoristasRepository.listarTodos();
+  // ── READ: Listar todos os motoristas ──────────────────
+  async listar() {
+    return await this.motoristasRepository.listarTodos();
   }
 
-  obterPorId(id) {
-    const motorista =
-      this.motoristasRepository.buscarPorId(id);
+  // ── READ: Buscar motorista por ID ─────────────────────
+  async obterPorId(id) {
+    const motorista = await this.motoristasRepository.buscarPorId(id);
 
     if (!motorista) {
       throw new ErroAplicacao(
@@ -24,7 +27,8 @@ export class MotoristasService {
     return motorista;
   }
 
-  criar(dados) {
+  // ── CREATE: Cadastrar um novo motorista ───────────────
+  async criar(dados) {
     const { nome, cpf, placaVeiculo } = dados;
 
     if (!nome || !cpf) {
@@ -34,8 +38,7 @@ export class MotoristasService {
       );
     }
 
-    const motoristaExistente =
-      this.motoristasRepository.buscarPorCpf(cpf);
+    const motoristaExistente = await this.motoristasRepository.buscarPorCpf(cpf);
 
     if (motoristaExistente) {
       throw new ErroAplicacao(
@@ -44,19 +47,21 @@ export class MotoristasService {
       );
     }
 
-    return this.motoristasRepository.criar({
+    return await this.motoristasRepository.criar({
       nome,
       cpf,
       placaVeiculo
     });
   }
 
-  obterEntregas(id, filtros = {}) {
-    const motorista = this.obterPorId(id);
+  // ── READ: Listar entregas de um motorista ─────────────
+  async obterEntregas(id, filtros = {}) {
+    const motorista = await this.obterPorId(id);
 
-    return this.entregasRepository.listarTodos({
+    return await this.entregasRepository.listarTodos({
       ...filtros,
       motoristaId: motorista.id
     });
   }
+
 }

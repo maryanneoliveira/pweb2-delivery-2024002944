@@ -1,7 +1,6 @@
-import { Database } from '../database/bancoDeDados.js';
 
-import { EntregasRepository } from '../repositories/repositorioEntregas.js';
-import { MotoristasRepository } from '../repositories/repositorioMotoristas.js';
+import { RepositorioEntregasPrisma } from '../repositories/repositorioEntregasPrisma.js';
+import { RepositorioMotoristasPrisma } from '../repositories/repositorioMotoristasPrisma.js';
 
 import { EntregasService } from '../services/servicoEntregas.js';
 import { MotoristasService } from '../services/servicoMotoristas.js';
@@ -17,16 +16,12 @@ import { criarRotasMotoristas } from './rotasMotoristas.js';
 // COMPOSITION ROOT
 // ==============================
 
-// Banco compartilhado
-const database = new Database();
-
-
-// Repositories
+// Repositories Prisma
 const entregasRepository =
-  new EntregasRepository(database);
+  new RepositorioEntregasPrisma();
 
 const motoristasRepository =
-  new MotoristasRepository(database);
+  new RepositorioMotoristasPrisma();
 
 
 // Services

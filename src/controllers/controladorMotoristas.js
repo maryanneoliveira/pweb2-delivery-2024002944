@@ -1,11 +1,14 @@
+
 export class MotoristasController {
+
   constructor(service) {
     this.service = service;
   }
 
-  listar = (req, res) => {
+  // ── READ: Listar todos os motoristas ──────────────────
+  listar = async (req, res) => {
     try {
-      const resultado = this.service.listar();
+      const resultado = await this.service.listar();
 
       return res.status(200).json(resultado);
     } catch (erro) {
@@ -15,10 +18,12 @@ export class MotoristasController {
     }
   };
 
-  obterPorId = (req, res) => {
+  // ── READ: Buscar motorista por ID ─────────────────────
+  obterPorId = async (req, res) => {
     try {
-      const resultado =
-        this.service.obterPorId(req.params.id);
+      const resultado = await this.service.obterPorId(
+        req.params.id
+      );
 
       return res.status(200).json(resultado);
     } catch (erro) {
@@ -28,10 +33,12 @@ export class MotoristasController {
     }
   };
 
-  criar = (req, res) => {
+  // ── CREATE: Cadastrar um novo motorista ───────────────
+  criar = async (req, res) => {
     try {
-      const resultado =
-        this.service.criar(req.body);
+      const resultado = await this.service.criar(
+        req.body
+      );
 
       return res.status(201).json(resultado);
     } catch (erro) {
@@ -41,13 +48,13 @@ export class MotoristasController {
     }
   };
 
-  obterEntregas = (req, res) => {
+  // ── READ: Consultar entregas de um motorista ──────────
+  obterEntregas = async (req, res) => {
     try {
-      const resultado =
-        this.service.obterEntregas(
-          req.params.id,
-          req.query
-        );
+      const resultado = await this.service.obterEntregas(
+        req.params.id,
+        req.query
+      );
 
       return res.status(200).json(resultado);
     } catch (erro) {
@@ -56,4 +63,5 @@ export class MotoristasController {
         .json({ erro: erro.message });
     }
   };
+
 }

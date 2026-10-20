@@ -1,17 +1,21 @@
+
 import { ErroAplicacao } from '../utils/erros.js';
 
 export class EntregasService {
+
   constructor(entregasRepository, motoristasRepository) {
     this.repository = entregasRepository;
     this.motoristasRepository = motoristasRepository;
   }
 
-  listar(filtros) {
-    return this.repository.listarTodos(filtros);
+  // ── READ: Listar entregas ─────────────────────────────
+  async listar(filtros) {
+    return await this.repository.listarTodos(filtros);
   }
 
-  obterPorId(id) {
-    const entrega = this.repository.buscarPorId(id);
+  // ── READ: Buscar entrega por ID ───────────────────────
+  async obterPorId(id) {
+    const entrega = await this.repository.buscarPorId(id);
 
     if (!entrega) {
       throw new ErroAplicacao(
@@ -23,7 +27,8 @@ export class EntregasService {
     return entrega;
   }
 
-  criar(dados) {
+  // ── CREATE: Cadastrar entrega ─────────────────────────
+  async criar(dados) {
     const { descricao, origem, destino } = dados;
 
     if (!descricao || !origem || !destino) {
@@ -40,12 +45,11 @@ export class EntregasService {
       );
     }
 
-    const duplicada =
-      this.repository.buscarDuplicataAtiva(
-        descricao,
-        origem,
-        destino
-      );
+    const duplicada = await this.repository.buscarDuplicataAtiva(
+      descricao,
+      origem,
+      destino
+    );
 
     if (duplicada) {
       throw new ErroAplicacao(
@@ -54,15 +58,16 @@ export class EntregasService {
       );
     }
 
-    return this.repository.criar({
+    return await this.repository.criar({
       descricao,
       origem,
       destino
     });
   }
 
-  avancar(id) {
-    const entrega = this.obterPorId(id);
+  // ── UPDATE: Avançar status da entrega ─────────────────
+  async avancar(id) {
+    const entrega = await this.obterPorId(id);
 
     if (entrega.status === 'CRIADA') {
       entrega.status = 'EM_TRANSITO';
@@ -80,14 +85,15 @@ export class EntregasService {
       descricao: `Status alterado para ${entrega.status}`
     });
 
-    return this.repository.atualizar(
+    return await this.repository.atualizar(
       entrega.id,
       entrega
     );
   }
 
-  cancelar(id) {
-    const entrega = this.obterPorId(id);
+  // ── UPDATE: Cancelar entrega ──────────────────────────
+  async cancelar(id) {
+    const entrega = await this.obterPorId(id);
 
     if (
       entrega.status === 'ENTREGUE' ||
@@ -106,14 +112,15 @@ export class EntregasService {
       descricao: 'Entrega cancelada'
     });
 
-    return this.repository.atualizar(
+    return await this.repository.atualizar(
       entrega.id,
       entrega
     );
   }
 
-  atribuir(id, dados) {
-    const entrega = this.obterPorId(id);
+  // ── UPDATE: Atribuir motorista à entrega ──────────────
+  async atribuir(id, dados) {
+    const entrega = await this.obterPorId(id);
 
     if (entrega.status !== 'CRIADA') {
       throw new ErroAplicacao(
@@ -122,10 +129,9 @@ export class EntregasService {
       );
     }
 
-    const motorista =
-      this.motoristasRepository.buscarPorId(
-        dados.motoristaId
-      );
+    const motorista = await this.motoristasRepository.buscarPorId(
+      dados.motoristaId
+    );
 
     if (!motorista) {
       throw new ErroAplicacao(
@@ -148,15 +154,17 @@ export class EntregasService {
       descricao: `Motorista ${motorista.id} atribuído à entrega`
     });
 
-    return this.repository.atualizar(
+    return await this.repository.atualizar(
       entrega.id,
       entrega
     );
   }
 
-  obterHistorico(id) {
-    const entrega = this.obterPorId(id);
+  // ── READ: Consultar histórico ─────────────────────────
+  async obterHistorico(id) {
+    const entrega = await this.obterPorId(id);
 
     return entrega.historico;
   }
+
 }
