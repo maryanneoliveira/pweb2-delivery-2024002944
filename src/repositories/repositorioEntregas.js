@@ -1,30 +1,82 @@
+/**
+ * Contrato IEntregasRepository
+ *
+ * @interface
+ *
+ * listarTodos(filtros?) -> Entrega[]
+ * buscarPorId(id) -> Entrega | null
+ * criar(dados) -> Entrega
+ * atualizar(id, dados) -> Entrega | null
+ */
 export class EntregasRepository {
   constructor(database) {
     this.db = database;
   }
 
-  buscarTodas(filtros = {}) {
+  /**
+   * Lista todas as entregas, permitindo filtros combinados.
+   *
+   * @param {Object} filtros
+   * @returns {Array}
+   */
+  listarTodos(filtros = {}) {
+    let entregas = this.db.entregas;
+
     if (filtros.status) {
-      return this.db.entregas.filter(e => e.status === filtros.status);
+      entregas = entregas.filter(
+        entrega => entrega.status === filtros.status
+      );
     }
-    return this.db.entregas;
+
+    if (filtros.motoristaId !== undefined) {
+      entregas = entregas.filter(
+        entrega => entrega.motoristaId === Number(filtros.motoristaId)
+      );
+    }
+
+    return entregas;
   }
 
+  /**
+   * Busca uma entrega pelo ID.
+   *
+   * @param {number|string} id
+   * @returns {Object|null}
+   */
   buscarPorId(id) {
-    return this.db.entregas.find(e => e.id === Number(id));
-  }
-
-  buscarDuplicataAtiva(descricao, origem, destino) {
-    return this.db.entregas.find(
-      e =>
-        e.descricao === descricao &&
-        e.origem === origem &&
-        e.destino === destino &&
-        e.status !== 'ENTREGUE' &&
-        e.status !== 'CANCELADA'
+    return (
+      this.db.entregas.find(
+        entrega => entrega.id === Number(id)
+      ) || null
     );
   }
 
+  /**
+   * Procura entrega ativa com mesma descrição,
+   * origem e destino.
+   *
+   * @param {string} descricao
+   * @param {string} origem
+   * @param {string} destino
+   * @returns {Object|undefined}
+   */
+  buscarDuplicataAtiva(descricao, origem, destino) {
+    return this.db.entregas.find(
+      entrega =>
+        entrega.descricao === descricao &&
+        entrega.origem === origem &&
+        entrega.destino === destino &&
+        entrega.status !== 'ENTREGUE' &&
+        entrega.status !== 'CANCELADA'
+    );
+  }
+
+  /**
+   * Cria uma nova entrega.
+   *
+   * @param {Object} dados
+   * @returns {Object}
+   */
   criar(dados) {
     const novaEntrega = {
       id: this.db.proximoId++,
@@ -40,16 +92,33 @@ export class EntregasRepository {
         }
       ]
     };
+
     this.db.entregas.push(novaEntrega);
+
     return novaEntrega;
   }
 
-  atualizar(entrega) {
-    const indice = this.db.entregas.findIndex(e => e.id === entrega.id);
-    if (indice !== -1) {
-      this.db.entregas[indice] = entrega;
-      return this.db.entregas[indice];
+  /**
+   * Atualiza uma entrega existente.
+   *
+   * @param {number|string} id
+   * @param {Object} dados
+   * @returns {Object|null}
+   */
+  atualizar(id, dados) {
+    const indice = this.db.entregas.findIndex(
+      entrega => entrega.id === Number(id)
+    );
+
+    if (indice === -1) {
+      return null;
     }
-    return null;
+
+    this.db.entregas[indice] = {
+      ...this.db.entregas[indice],
+      ...dados
+    };
+
+    return this.db.entregas[indice];
   }
 }
