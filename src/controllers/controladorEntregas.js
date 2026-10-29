@@ -1,110 +1,94 @@
-
 export class EntregasController {
-
   constructor(service) {
     this.service = service;
   }
-
-  // ── READ: Listar entregas ─────────────────────────────
   listar = async (req, res) => {
     try {
-      const resultado = await this.service.listar(req.query);
-
-      return res.status(200).json(resultado);
+      const entregas = await this.service.listar(req.query);
+      return res.render("entregas/index", {
+        titulo: "Entregas",
+        entregas,
+        statusSelecionado: req.query.status || "",
+      });
     } catch (erro) {
       return res
         .status(erro.codigoStatus || 500)
-        .json({ erro: erro.message });
+        .render("erro", { titulo: "Erro", mensagem: erro.message });
     }
   };
-
-  // ── READ: Buscar entrega por ID ───────────────────────
   obterPorId = async (req, res) => {
     try {
-      const resultado = await this.service.obterPorId(
-        req.params.id
-      );
-
-      return res.status(200).json(resultado);
+      const entrega = await this.service.obterPorId(req.params.id);
+      const motoristas = await this.service.motoristasRepository.listarTodos();
+      return res.render("entregas/show", {
+        titulo: "Detalhes da entrega",
+        entrega,
+        motoristas,
+      });
     } catch (erro) {
       return res
         .status(erro.codigoStatus || 500)
-        .json({ erro: erro.message });
+        .render("erro", { titulo: "Erro", mensagem: erro.message });
     }
   };
-
-  // ── CREATE: Cadastrar uma nova entrega ────────────────
   criar = async (req, res) => {
     try {
-      const resultado = await this.service.criar(req.body);
-
-      return res.status(201).json(resultado);
+      const entrega = await this.service.criar(req.body);
+      req.flash("sucesso", "Entrega cadastrada com sucesso.");
+      return res.redirect("/entregas/" + entrega.id);
     } catch (erro) {
       return res
-        .status(erro.codigoStatus || 500)
-        .json({ erro: erro.message });
+        .status(
+          erro.codigoStatus && erro.codigoStatus < 500
+            ? erro.codigoStatus
+            : 500,
+        )
+        .render("entregas/new", {
+          titulo: "Nova Entrega",
+          erros: [erro.message],
+          dados: req.body,
+        });
     }
   };
-
-  // ── UPDATE: Avançar status da entrega ─────────────────
   avancar = async (req, res) => {
     try {
-      const resultado = await this.service.avancar(
-        req.params.id
-      );
-
-      return res.status(200).json(resultado);
+      await this.service.avancar(req.params.id);
+      req.flash("sucesso", "Status da entrega atualizado.");
     } catch (erro) {
-      return res
-        .status(erro.codigoStatus || 500)
-        .json({ erro: erro.message });
+      req.flash("erro", erro.message);
     }
+    return res.redirect("/entregas/" + req.params.id);
   };
-
-  // ── UPDATE: Cancelar uma entrega ──────────────────────
   cancelar = async (req, res) => {
     try {
-      const resultado = await this.service.cancelar(
-        req.params.id
-      );
-
-      return res.status(200).json(resultado);
+      await this.service.cancelar(req.params.id);
+      req.flash("sucesso", "Entrega cancelada.");
     } catch (erro) {
-      return res
-        .status(erro.codigoStatus || 500)
-        .json({ erro: erro.message });
+      req.flash("erro", erro.message);
     }
+    return res.redirect("/entregas/" + req.params.id);
   };
-
-  // ── UPDATE: Atribuir motorista à entrega ──────────────
   atribuir = async (req, res) => {
     try {
-      const resultado = await this.service.atribuir(
-        req.params.id,
-        req.body
-      );
-
-      return res.status(200).json(resultado);
+      await this.service.atribuir(req.params.id, req.body);
+      req.flash("sucesso", "Motorista atribuído com sucesso.");
     } catch (erro) {
-      return res
-        .status(erro.codigoStatus || 500)
-        .json({ erro: erro.message });
+      req.flash("erro", erro.message);
     }
+    return res.redirect("/entregas/" + req.params.id);
   };
-
-  // ── READ: Consultar histórico da entrega ─────────────
   obterHistorico = async (req, res) => {
     try {
-      const resultado = await this.service.obterHistorico(
-        req.params.id
-      );
-
-      return res.status(200).json(resultado);
+      const historico = await this.service.obterHistorico(req.params.id);
+      return res.render("entregas/historico", {
+        titulo: "Histórico da entrega",
+        historico,
+        id: req.params.id,
+      });
     } catch (erro) {
       return res
         .status(erro.codigoStatus || 500)
-        .json({ erro: erro.message });
+        .render("erro", { titulo: "Erro", mensagem: erro.message });
     }
   };
-
 }

@@ -1,67 +1,70 @@
-
 export class MotoristasController {
-
   constructor(service) {
     this.service = service;
   }
-
-  // ── READ: Listar todos os motoristas ──────────────────
   listar = async (req, res) => {
     try {
-      const resultado = await this.service.listar();
-
-      return res.status(200).json(resultado);
+      const motoristas = await this.service.listar();
+      return res.render("motorista/index", {
+        titulo: "Motoristas",
+        motoristas,
+      });
     } catch (erro) {
       return res
         .status(erro.codigoStatus || 500)
-        .json({ erro: erro.message });
+        .render("erro", { titulo: "Erro", mensagem: erro.message });
     }
   };
-
-  // ── READ: Buscar motorista por ID ─────────────────────
   obterPorId = async (req, res) => {
     try {
-      const resultado = await this.service.obterPorId(
-        req.params.id
-      );
-
-      return res.status(200).json(resultado);
+      const motorista = await this.service.obterPorId(req.params.id);
+      const entregas = await this.service.obterEntregas(req.params.id);
+      return res.render("motorista/show", {
+        titulo: "Detalhes do motorista",
+        motorista,
+        entregas,
+      });
     } catch (erro) {
       return res
         .status(erro.codigoStatus || 500)
-        .json({ erro: erro.message });
+        .render("erro", { titulo: "Erro", mensagem: erro.message });
     }
   };
-
-  // ── CREATE: Cadastrar um novo motorista ───────────────
   criar = async (req, res) => {
     try {
-      const resultado = await this.service.criar(
-        req.body
-      );
-
-      return res.status(201).json(resultado);
+      const motorista = await this.service.criar(req.body);
+      req.flash("sucesso", "Motorista cadastrado com sucesso.");
+      return res.redirect("/motoristas/" + motorista.id);
     } catch (erro) {
       return res
-        .status(erro.codigoStatus || 500)
-        .json({ erro: erro.message });
+        .status(
+          erro.codigoStatus && erro.codigoStatus < 500
+            ? erro.codigoStatus
+            : 500,
+        )
+        .render("motorista/new", {
+          titulo: "Novo Motorista",
+          erros: [erro.message],
+          dados: req.body,
+        });
     }
   };
-
-  // ── READ: Consultar entregas de um motorista ──────────
   obterEntregas = async (req, res) => {
     try {
-      const resultado = await this.service.obterEntregas(
+      const motorista = await this.service.obterPorId(req.params.id);
+      const entregas = await this.service.obterEntregas(
         req.params.id,
-        req.query
+        req.query,
       );
-
-      return res.status(200).json(resultado);
+      return res.render("motorista/show", {
+        titulo: "Entregas do motorista",
+        motorista,
+        entregas,
+      });
     } catch (erro) {
       return res
         .status(erro.codigoStatus || 500)
-        .json({ erro: erro.message });
+        .render("erro", { titulo: "Erro", mensagem: erro.message });
     }
   };
-
 }
