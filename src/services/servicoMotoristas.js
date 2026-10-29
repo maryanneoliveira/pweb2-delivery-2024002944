@@ -1,8 +1,6 @@
-
-import { ErroAplicacao } from '../utils/erros.js';
+import { ErroAplicacao } from "../utils/erros.js";
 
 export class MotoristasService {
-
   constructor(motoristasRepository, entregasRepository) {
     this.motoristasRepository = motoristasRepository;
     this.entregasRepository = entregasRepository;
@@ -18,10 +16,7 @@ export class MotoristasService {
     const motorista = await this.motoristasRepository.buscarPorId(id);
 
     if (!motorista) {
-      throw new ErroAplicacao(
-        'Motorista não encontrado',
-        404
-      );
+      throw new ErroAplicacao("Motorista não encontrado", 404);
     }
 
     return motorista;
@@ -32,25 +27,23 @@ export class MotoristasService {
     const { nome, cpf, placaVeiculo } = dados;
 
     if (!nome || !cpf) {
-      throw new ErroAplicacao(
-        'Campos obrigatórios faltando: nome ou cpf',
-        400
-      );
+      throw new ErroAplicacao("Campos obrigatórios faltando: nome ou cpf", 400);
     }
 
-    const motoristaExistente = await this.motoristasRepository.buscarPorCpf(cpf);
+    const motoristaExistente =
+      await this.motoristasRepository.buscarPorCpf(cpf);
 
     if (motoristaExistente) {
       throw new ErroAplicacao(
-        'Já existe um motorista cadastrado com este CPF',
-        409
+        "Já existe um motorista cadastrado com este CPF",
+        409,
       );
     }
 
     return await this.motoristasRepository.criar({
       nome,
       cpf,
-      placaVeiculo
+      placaVeiculo,
     });
   }
 
@@ -60,8 +53,7 @@ export class MotoristasService {
 
     return await this.entregasRepository.listarTodos({
       ...filtros,
-      motoristaId: motorista.id
+      motoristaId: motorista.id,
     });
   }
-
 }
