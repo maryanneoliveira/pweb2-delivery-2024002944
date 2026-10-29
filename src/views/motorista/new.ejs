@@ -1,0 +1,23 @@
+<div class="form-container">
+    <h1>Novo Motorista</h1>
+    <% if (erros && erros.length) { %>
+        <div class="alert alert-error">
+            <ul>
+                <% erros.forEach(erro=> { %><li>
+                        <%= erro %>
+                    </li>
+                    <% }) %>
+            </ul>
+        </div>
+        <% } %>
+            <form method="POST" action="/motoristas" novalidate>
+                <div class="form-group"><label for="nome">Nome</label><input id="nome" name="nome"
+                        value="<%= dados.nome || '' %>" required></div>
+                <div class="form-group"><label for="cpf">CPF</label><input id="cpf" name="cpf"
+                        value="<%= dados.cpf || '' %>" required></div>
+                <div class="form-group"><label for="placaVeiculo">Placa do veículo (opcional)</label><input
+                        id="placaVeiculo" name="placaVeiculo" value="<%= dados.placaVeiculo || '' %>"></div>
+                <div class="form-actions"><a href="/motoristas" class="btn btn-secondary">Cancelar</a><button
+                        type="submit" class="btn btn-primary">Criar Motorista</button></div>
+            </form>
+</div>

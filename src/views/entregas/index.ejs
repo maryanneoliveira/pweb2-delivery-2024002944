@@ -1,0 +1,47 @@
+<div class="page-header">
+    <h1>Entregas</h1><a class="btn btn-primary" href="/entregas/nova">Nova Entrega</a>
+</div>
+<form method="GET" action="/entregas" class="form-actions"><label for="status">Status</label><select id="status"
+        name="status">
+        <option value="">Todos</option>
+        <% ['CRIADA','EM_TRANSITO','ENTREGUE','CANCELADA'].forEach(s=> { %><option value="<%= s %>"
+                <%=statusSelecionado===s ? 'selected' : '' %>><%= s %>
+            </option>
+            <% }) %>
+    </select><button class="btn btn-secondary" type="submit">Filtrar</button></form>
+<table class="table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Descrição</th>
+            <th>Origem</th>
+            <th>Destino</th>
+            <th>Status</th>
+            <th>Ação</th>
+        </tr>
+    </thead>
+    <tbody>
+        <% entregas.forEach(entrega=> { %><tr>
+                <td>
+                    <%= entrega.id %>
+                </td>
+                <td>
+                    <%= entrega.descricao %>
+                </td>
+                <td>
+                    <%= entrega.origem %>
+                </td>
+                <td>
+                    <%= entrega.destino %>
+                </td>
+                <td><span class="badge">
+                        <%= entrega.status %>
+                    </span></td>
+                <td><a href="/entregas/<%= entrega.id %>" class="btn btn-link">Ver detalhes</a></td>
+            </tr>
+            <% }) %>
+    </tbody>
+</table>
+<% if (!entregas.length) { %>
+    <p>Nenhuma entrega encontrada.</p>
+    <% } %>

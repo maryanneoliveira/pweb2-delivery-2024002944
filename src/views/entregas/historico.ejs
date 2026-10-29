@@ -1,0 +1,1 @@
+<h1>Histórico da entrega <%= id %></h1><ul><% historico.forEach(evento => { %><li><%= new Date(evento.data).toLocaleString('pt-BR') %> — <%= evento.descricao %></li><% }) %></ul><a href="/entregas/<%= id %>" class="btn btn-link">← Voltar</a>
