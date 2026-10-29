@@ -1,46 +1,28 @@
 import express from 'express';
-
-import {
-  rotasEntregas,
-  rotasMotoristas
-} from './src/routes/index.js';
-
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import layouts from 'express-ejs-layouts';
+import session from 'express-session';
+import flash from 'connect-flash';
+import methodOverride from 'method-override';
+import { rotasEntregas, rotasMotoristas } from './src/routes/index.js';
+const diretorio = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
-
+app.set('views', path.join(diretorio, 'src/views'));
+app.set('view engine', 'ejs');
+app.set('layout', 'layouts/base');
+app.use(layouts);
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-
-
-// Health check
-app.get('/api/health', (req, res) =>
-  res.json({ status: 'ok' })
-);
-
-
-// Rotas
-app.use(
-  '/api/entregas',
-  rotasEntregas
-);
-
-app.use(
-  '/api/motoristas',
-  rotasMotoristas
-);
-
-
-// 404
-app.use((req, res) =>
-  res
-    .status(404)
-    .json({ erro: 'recurso não encontrado' })
-);
-
-
-const PORT =
-  process.env.PORT || 3000;
-
-app.listen(PORT, () =>
-  console.log(
-    `Delivery Tracker rodando em http://localhost:${PORT}`
-  )
-);
+app.use(methodOverride('_method'));
+app.use(session({ secret: process.env.SESSION_SECRET || 'delivery-tracker-sessao-local', resave: false, saveUninitialized: false, cookie: { httpOnly: true, sameSite: 'lax' } }));
+app.use(flash());
+app.use(express.static(path.join(diretorio, 'public')));
+app.use((req, res, next) => { res.locals.mensagens = { sucesso: req.flash('sucesso'), erro: req.flash('erro') }; next(); });
+app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
+app.get('/', (req, res) => res.redirect('/entregas'));
+app.use('/entregas', rotasEntregas);
+app.use('/motoristas', rotasMotoristas);
+app.use((req, res) => res.status(404).render('erro', { titulo: 'Página não encontrada', mensagem: 'A página solicitada não existe.' }));
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Delivery Tracker rodando em http://localhost:${PORT}`));

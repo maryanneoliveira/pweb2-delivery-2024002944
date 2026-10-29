@@ -1,0 +1,35 @@
+<div class="page-header">
+    <h1>Motoristas</h1><a href="/motoristas/novo" class="btn btn-primary">Novo Motorista</a>
+</div>
+<table class="table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Nome</th>
+            <th>CPF</th>
+            <th>Status</th>
+            <th>Ação</th>
+        </tr>
+    </thead>
+    <tbody>
+        <% motoristas.forEach(motorista=> { %><tr>
+                <td>
+                    <%= motorista.id %>
+                </td>
+                <td>
+                    <%= motorista.nome %>
+                </td>
+                <td>
+                    <%= motorista.cpf %>
+                </td>
+                <td>
+                    <%= motorista.status %>
+                </td>
+                <td><a href="/motoristas/<%= motorista.id %>" class="btn btn-link">Ver detalhes</a></td>
+            </tr>
+            <% }) %>
+    </tbody>
+</table>
+<% if (!motoristas.length) { %>
+    <p>Nenhum motorista cadastrado.</p>
+    <% } %>

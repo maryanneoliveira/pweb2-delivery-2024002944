@@ -1,0 +1,58 @@
+<div class="card">
+    <div class="card-header">
+        <h1>
+            <%= entrega.descricao %>
+        </h1><span class="badge">
+            <%= entrega.status %>
+        </span>
+    </div>
+    <dl class="details">
+        <dt>ID</dt>
+        <dd>
+            <%= entrega.id %>
+        </dd>
+        <dt>Origem</dt>
+        <dd>
+            <%= entrega.origem %>
+        </dd>
+        <dt>Destino</dt>
+        <dd>
+            <%= entrega.destino %>
+        </dd>
+        <dt>Status</dt>
+        <dd>
+            <%= entrega.status %>
+        </dd>
+        <dt>Motorista</dt>
+        <dd>
+            <%= entrega.motoristaId || 'Não atribuído' %>
+        </dd>
+    </dl>
+    <% if (entrega.status==='CRIADA' || entrega.status==='EM_TRANSITO' ) { %>
+        <div class="form-actions">
+            <form method="POST" action="/entregas/<%= entrega.id %>/avancar?_method=PATCH"><button type="submit"
+                    class="btn btn-primary">Avançar status</button></form>
+            <form method="POST" action="/entregas/<%= entrega.id %>/cancelar?_method=PATCH"><button type="submit"
+                    class="btn btn-danger" onclick="return confirm('Cancelar esta entrega?')">Cancelar entrega</button>
+            </form>
+        </div>
+        <% } %>
+            <% if (entrega.status==='CRIADA' ) { %>
+                <form method="POST" action="/entregas/<%= entrega.id %>/atribuir?_method=PATCH" class="form-actions">
+                    <label for="motoristaId">Motorista</label><select id="motoristaId" name="motoristaId" required>
+                        <option value="">Selecione</option>
+                        <% motoristas.filter(m=> m.status === 'ATIVO').forEach(m => { %><option value="<%= m.id %>"
+                                <%=entrega.motoristaId===m.id ? 'selected' : '' %>><%= m.nome %>
+                            </option>
+                            <% }) %>
+                    </select><button type="submit" class="btn btn-secondary">Atribuir motorista</button></form>
+                <% } %>
+                    <h2>Histórico</h2>
+                    <ul>
+                        <% (entrega.historico || []).forEach(evento=> { %><li>
+                                <%= new Date(evento.data).toLocaleString('pt-BR') %> — <%= evento.descricao %>
+                            </li>
+                            <% }) %>
+                    </ul>
+                    <p><a href="/entregas" class="btn btn-link">← Voltar</a></p>
+</div>

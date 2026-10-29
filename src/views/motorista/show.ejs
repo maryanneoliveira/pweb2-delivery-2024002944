@@ -1,0 +1,54 @@
+
+<div class="card">
+  <div class="card-header">
+    <h1><%= motorista.nome %></h1>
+  </div>
+
+  <dl class="details">
+    <dt>CPF</dt>
+    <dd><%= motorista.cpf %></dd>
+
+    <dt>Placa do veículo</dt>
+    <dd><%= motorista.placaVeiculo || 'Não informada' %></dd>
+
+    <dt>Status</dt>
+    <dd><%= motorista.status %></dd>
+  </dl>
+
+  <h2>Entregas do motorista</h2>
+
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Descrição</th>
+        <th>Status</th>
+        <th>Ação</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <% entregas.forEach(entrega => { %>
+        <tr>
+          <td><%= entrega.descricao %></td>
+          <td><%= entrega.status %></td>
+          <td>
+            <a
+              href="/entregas/<%= entrega.id %>"
+              class="btn btn-link"
+            >
+              Ver entrega
+            </a>
+          </td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+
+  <% if (!entregas.length) { %>
+    <p>Nenhuma entrega atribuída.</p>
+  <% } %>
+
+  <a href="/motoristas" class="btn btn-link">
+    ← Voltar
+  </a>
+</div>

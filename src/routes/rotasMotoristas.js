@@ -1,27 +1,16 @@
-import { Router } from 'express';
-
+import { Router } from "express";
 export function criarRotasMotoristas(controller) {
-  const rotasMotoristas = Router();
-
-  rotasMotoristas.post(
-    '/',
-    controller.criar
+  const router = Router();
+  router.get("/", controller.listar);
+  router.get("/novo", (req, res) =>
+    res.render("motorista/new", {
+      titulo: "Novo Motorista",
+      erros: [],
+      dados: {},
+    }),
   );
-
-  rotasMotoristas.get(
-    '/',
-    controller.listar
-  );
-
-  rotasMotoristas.get(
-    '/:id/entregas',
-    controller.obterEntregas
-  );
-
-  rotasMotoristas.get(
-    '/:id',
-    controller.obterPorId
-  );
-
-  return rotasMotoristas;
+  router.post("/", controller.criar);
+  router.get("/:id/entregas", controller.obterEntregas);
+  router.get("/:id", controller.obterPorId);
+  return router;
 }
